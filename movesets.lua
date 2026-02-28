@@ -400,11 +400,13 @@ local function act_63_start_crouch(m)
         else
             set_mario_action(m, ACT_63_ROLLOUT, 0)
             m.pos.y = m.pos.y + 20
+            local initSpeed = 20
+            local cap = 45
             if m.forwardVel > 0 then
-                if m.forwardVel < 40 then
-                    m.forwardVel = m.forwardVel + 10
+                if m.forwardVel < (cap - initSpeed) then
+                    m.forwardVel = m.forwardVel + initSpeed
                 else
-                    m.forwardVel = 50
+                    m.forwardVel = cap
                 end
             end
         end
