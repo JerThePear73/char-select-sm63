@@ -1,0 +1,16 @@
+extern const GeoLayout jers_shine_sprite_geo[];
+extern u8 jers_shine_sprite_shine_sprite_rgba16[];
+extern u8 jers_shine_sprite_shine_sprite_env_map_rgba16[];
+extern u8 jers_shine_sprite_star_eye_rgba16[];
+extern Vtx jers_shine_sprite_Shine_Sprite_DL_mesh_layer_1_vtx_0[32];
+extern Gfx jers_shine_sprite_Shine_Sprite_DL_mesh_layer_1_tri_0[];
+extern Vtx jers_shine_sprite_Shine_Sprite_DL_mesh_layer_1_vtx_1[144];
+extern Gfx jers_shine_sprite_Shine_Sprite_DL_mesh_layer_1_tri_1[];
+extern Vtx jers_shine_sprite_Shine_Sprite_DL_mesh_layer_4_vtx_0[8];
+extern Gfx jers_shine_sprite_Shine_Sprite_DL_mesh_layer_4_tri_0[];
+extern Gfx mat_jers_shine_sprite_Shine_Sprite_Circle[];
+extern Gfx mat_jers_shine_sprite_Shine_Sprite_Map[];
+extern Gfx mat_revert_jers_shine_sprite_Shine_Sprite_Map[];
+extern Gfx mat_jers_shine_sprite_Star_Eyes[];
+extern Gfx jers_shine_sprite_Shine_Sprite_DL_mesh_layer_1[];
+extern Gfx jers_shine_sprite_Shine_Sprite_DL_mesh_layer_4[];
