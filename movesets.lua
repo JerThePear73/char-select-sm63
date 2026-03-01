@@ -174,6 +174,7 @@ local function act_63_rollout(m)
         m.vel.y = 35 + math.abs(m.forwardVel/3)
         e.gfxX = -0x10000
     end
+
     local stepResult = common_air_action_step(m, ACT_JUMP_LAND, MARIO_ANIM_SINGLE_JUMP, AIR_STEP_CHECK_LEDGE_GRAB)
 
     if m.actionTimer == 6 then -- spin sound
@@ -410,6 +411,14 @@ local function act_63_start_crouch(m)
                 end
             end
         end
+    elseif m.input & INPUT_B_PRESSED ~= 0 then
+        if m.forwardVel < 45 then
+            e.gfxX = -0x10000
+        else
+            e.gfxX = -0x20000
+        end
+        e.gfxY = 100
+        return set_mario_action(m, ACT_SLIDE_KICK, 0)
     elseif m.actionTimer > 5 then
         if m.forwardVel > 0 then
             set_mario_action(m, ACT_DIVE_SLIDE, 0)
@@ -683,6 +692,15 @@ local function mario_update(m)
         s.water = 0
     end
     e.prevLives = m.numLives
+    -- slide kick
+    if m.action == ACT_SLIDE_KICK then
+        e.gfxX = e.gfxX * 0.8
+        e.gfxY = e.gfxY * 0.8
+        m.marioObj.header.gfx.angle.x = e.gfxX
+        m.marioObj.header.gfx.pos.y = m.pos.y + e.gfxY
+        m.marioObj.header.gfx.animInfo.animFrame = 7
+        m.marioObj.header.gfx.animInfo.animAccel = 0
+    end
 end
 
 local function mario_set_action(m)
@@ -695,7 +713,7 @@ local function mario_set_action(m)
     -- rollout
     if (m.action == ACT_FORWARD_ROLLOUT or
         m.action == ACT_BACKWARD_ROLLOUT) and
-        m.prevAction == ACT_DIVE_SLIDE then
+        (m.prevAction == ACT_DIVE_SLIDE or m.prevAction == ACT_SLIDE_KICK_SLIDE) then
         set_mario_action(m, ACT_63_ROLLOUT, 0)
     end
     -- dive
@@ -708,8 +726,14 @@ local function mario_set_action(m)
         set_mario_action(m, ACT_63_START_CROUCH, 0)
     end
 
-    e.gfxX = 0
-    e.gfxZ = 0
+    if m.action == ACT_SLIDE_KICK then
+        play_sound(SOUND_GENERAL_SWISH_WATER, m.marioObj.header.gfx.cameraToObject)
+        m.vel.y = 20
+    else
+        e.gfxX = 0
+        e.gfxY = 0
+        e.gfxZ = 0
+    end
 end
 
 local function mario_before_set_action(m, act)
@@ -767,8 +791,7 @@ end
 
 local function give_fludd(id)
     local m = gMarioStates[0]
-    local e = gExtraStates[m.playerIndex]
-    local s = gPlayerSyncTable[m.playerIndex]
+    local s = gPlayerSyncTable[0]
 
     if id == SOUND_GENERAL_COLLECT_1UP and m.action ~= ACT_EXIT_LAND_SAVE_DIALOG then
         if s.water > 75 then
@@ -778,7 +801,6 @@ local function give_fludd(id)
         else
             s.water = waterMax
         end
-        --oPos = { x = o.oPosX, y = o.oPosY, z = o.oPosZ}
         audio_sample_play(SOUND_FLUDD_PICKUP, m.pos, pause_check())
         spawn_non_sync_object(id_bhvMistCircParticleSpawner, E_MODEL_NONE, m.pos.x, m.pos.y, m.pos.z, nil)
     end
