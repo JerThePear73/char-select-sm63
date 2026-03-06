@@ -10,8 +10,8 @@ if not _G.charSelectExists then
 end
 
 -- Models --
-local E_MODEL_J_MARIO = smlua_model_util_get_id('jers_mario_geo')
---local E_MODEL_J_LUIGI = smlua_model_util_get_id('jers_luigi_geo')
+local E_MODEL_J_MARIO = smlua_model_util_get_id("jers_mario_geo")
+--local E_MODEL_J_LUIGI = smlua_model_util_get_id("jers_luigi_geo")
 local E_MODEL_SHINE_SPRITE = smlua_model_util_get_id("jers_shine_sprite_geo")
 
 -- Textures --
@@ -114,29 +114,29 @@ local PALETTES_MARIO = {
         [EMBLEM] = "FF0000",
     },
     {
-        name = "Nostalgic Promo",
-        [PANTS]  = "0000ff",
-        [SHIRT]  = "df1f0f",
-        [GLOVES] = "dfffdf",
-        [SHOES]  = "7f3300",
-        [HAIR]   = "4f1f00",
-        [SKIN]   = "ff9f5f",
-        [CAP]    = "df1f0f",
-        [EMBLEM] = "df1f0f",
-    },
-    {
-        name = "Frenchie",
-        [PANTS]  = "163293",
-        [SHIRT]  = "F51317",
+        name = "Blue Brawler",
+        [PANTS]  = "d32210",
+        [SHIRT]  = "4231b6",
         [GLOVES] = "ffffff",
-        [SHOES]  = "721C0E",
-        [HAIR]   = "721C0E",
-        [SKIN]   = "FEC179",
-        [CAP]    = "F51317",
-        [EMBLEM] = "F51317",
+        [SHOES]  = "472708",
+        [HAIR]   = "730600",
+        [SKIN]   = "fec179",
+        [CAP]    = "4231b6",
+        [EMBLEM] = "4231b6",
     },
     {
-        name = "Clumsy in Nature",
+        name = "Aged Beige",
+        [PANTS]  = "4b1d00",
+        [SHIRT]  = "bdb66c",
+        [GLOVES] = "ffffff",
+        [SHOES]  = "18275d",
+        [HAIR]   = "730600",
+        [SKIN]   = "fec179",
+        [CAP]    = "4b1d00",
+        [EMBLEM] = "4b1d00",
+    },
+    {
+        name = "Clumsy In Nature",
         [PANTS]  = "ffffff",
         [SHIRT]  = "ff0000",
         [GLOVES] = "fec179",

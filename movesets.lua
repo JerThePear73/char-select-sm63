@@ -4,8 +4,8 @@ local ACT_63_SPIN_GROUND = allocate_mario_action(ACT_GROUP_MOVING | ACT_FLAG_MOV
 local ACT_63_SWIM_IDLE = allocate_mario_action(ACT_GROUP_SUBMERGED | ACT_FLAG_MOVING | ACT_FLAG_WATER_OR_TEXT | ACT_FLAG_SWIMMING)
 local ACT_63_SWIM_STROKE = allocate_mario_action(ACT_GROUP_SUBMERGED | ACT_FLAG_MOVING | ACT_FLAG_WATER_OR_TEXT | ACT_FLAG_SWIMMING)
 local ACT_63_HOVER_FALLBACK = allocate_mario_action(ACT_GROUP_AIRBORNE | ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
-local ACT_63_START_CROUCH = allocate_mario_action(ACT_GROUP_MOVING | ACT_FLAG_MOVING | ACT_FLAG_ATTACKING)
-local ACT_63_EXIT_CROUCH = allocate_mario_action(ACT_GROUP_MOVING | ACT_FLAG_MOVING | ACT_FLAG_ATTACKING)
+local ACT_63_START_CROUCH = allocate_mario_action(ACT_GROUP_MOVING | ACT_FLAG_MOVING | ACT_FLAG_ATTACKING | ACT_FLAG_SHORT_HITBOX)
+local ACT_63_EXIT_CROUCH = allocate_mario_action(ACT_GROUP_MOVING | ACT_FLAG_MOVING)
 local ACT_63_CROUCH = allocate_mario_action(ACT_GROUP_STATIONARY | ACT_FLAG_MOVING)
 local ACT_63_BACKFLIP = allocate_mario_action(ACT_GROUP_AIRBORNE | ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
 local ACT_127_GP_JUMP = allocate_mario_action(ACT_GROUP_AIRBORNE | ACT_FLAG_AIR | ACT_FLAG_ALLOW_VERTICAL_WIND_ACTION)
@@ -118,7 +118,7 @@ local function do_fludd_hover(m)
     local e = gExtraStates[m.playerIndex]
     local s = gPlayerSyncTable[m.playerIndex]
 
-    if m.pos.y == m.floorHeight then
+    if m.pos.y == m.floorHeight and m.floor.normal.y > 0.8 then
         m.pos.y = m.pos.y + 10
         set_mario_action(m, ACT_63_HOVER_FALLBACK, 0)
     end
@@ -128,7 +128,7 @@ local function do_fludd_hover(m)
     e.pressure = e.pressure - 1
     m.faceAngle.y = m.intendedYaw - approach_s32(convert_s16(m.intendedYaw - m.faceAngle.y), 0, 0x400, 0x400)
     m.vel.y = approach_f32(m.vel.y, 8, 8, -1)
-    if m.forwardVel > 20 then
+    if m.forwardVel > 18 then
         m.forwardVel = m.forwardVel - 2
     end
 end
@@ -353,6 +353,8 @@ local function act_63_hover_fallback(m)
         return set_mario_action(m, ACT_DIVE, 0)
     elseif m.input & INPUT_Z_PRESSED ~= 0 then
         return set_mario_action(m, ACT_GROUND_POUND, 0)
+    elseif m.controller.buttonDown & X_BUTTON ~= 0 and m.actionTimer > 15 then
+        return set_mario_action(m, ACT_63_SPIN_AIR, 0)
     end
 
     m.actionTimer = m.actionTimer + 1
@@ -419,11 +421,15 @@ local function act_63_start_crouch(m)
         end
         e.gfxY = 100
         return set_mario_action(m, ACT_SLIDE_KICK, 0)
-    elseif m.actionTimer > 5 then
-        if m.forwardVel > 0 then
-            set_mario_action(m, ACT_DIVE_SLIDE, 0)
-        else
-            set_mario_action(m, ACT_63_CROUCH, 0)
+    elseif m.actionTimer > 4 then
+        if m.input & INPUT_Z_DOWN == 0 and m.forwardVel == 0 then
+            return set_mario_action(m, ACT_63_EXIT_CROUCH, 0)
+        elseif m.actionTimer > 15 then
+            if m.forwardVel == 0 then
+                set_mario_action(m, ACT_63_CROUCH, 0)
+            else
+                set_mario_action(m, ACT_DIVE_SLIDE, 0)
+            end
         end
     end
 
@@ -544,7 +550,7 @@ local spinActions = {
     [ACT_SIDE_FLIP] = true,
     [ACT_WALL_KICK_AIR] = true,
     [ACT_FREEFALL] = true,
-    [ACT_63_HOVER_FALLBACK] = true,
+    --[ACT_63_HOVER_FALLBACK] = true,
     [ACT_63_BACKFLIP] = true,
     [ACT_127_GP_JUMP] = true,
     --[ACT_LONG_JUMP] = true,
@@ -605,7 +611,8 @@ local function mario_update(m)
     end
     -- metal cap can move underwater airborne
     if m.intendedMag ~= 0 and m.action == ACT_METAL_WATER_FALLING then
-        m.forwardVel = m.intendedMag
+        m.forwardVel = approach_f32(m.forwardVel, m.intendedMag - 12, 2, 1)
+        m.faceAngle.y = m.intendedYaw - approach_s32(convert_s16(m.intendedYaw - m.faceAngle.y), 0, 0x200, 0x200)
     end
     -- walking
     if m.action == ACT_WALKING and m.pos.y > m.waterLevel then
@@ -652,8 +659,13 @@ local function mario_update(m)
     end
 
     --wing cap
-    if m.action == ACT_DIVE and m.prevAction ~= ACT_GROUND_POUND and m.flags & MARIO_WING_CAP ~= 0 and m.vel.y < 0 then
+    if m.action == ACT_DIVE and m.prevAction ~= ACT_GROUND_POUND and m.flags & MARIO_WING_CAP ~= 0 and m.vel.y < 0 and m.pos.y > (m.floorHeight + 100) then
         m.action = ACT_FLYING
+        e.gfxZ = 0x10000
+    end
+    if m.action == ACT_FLYING then
+        e.gfxZ = math.lerp(e.gfxZ, 0, 0.1)
+        m.marioObj.header.gfx.angle.z = m.marioObj.header.gfx.angle.z + e.gfxZ
     end
 
     -- fludd
@@ -754,6 +766,9 @@ local function mario_before_set_action(m, act)
     -- crouch
     elseif act == ACT_STOMACH_SLIDE_STOP then
         return ACT_63_CROUCH
+    -- flying fix; idk if this is necessary cuz of custom twirling
+    elseif act == ACT_FLYING then
+        m.marioObj.header.gfx.angle.y = m.faceAngle.y
     end
 end
 

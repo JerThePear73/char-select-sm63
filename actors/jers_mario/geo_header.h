@@ -109,7 +109,7 @@ extern Vtx jers_mario_Torso_mesh_layer_1_vtx_2[6];
 extern Gfx jers_mario_Torso_mesh_layer_1_tri_2[];
 extern Vtx jers_mario_Torso_mesh_layer_1_vtx_3[38];
 extern Gfx jers_mario_Torso_mesh_layer_1_tri_3[];
-extern Vtx jers_mario_Torso_mesh_layer_1_vtx_4[16];
+extern Vtx jers_mario_Torso_mesh_layer_1_vtx_4[18];
 extern Gfx jers_mario_Torso_mesh_layer_1_tri_4[];
 extern Vtx jers_mario_Fludd_Switch_Option_Fludd_DL_mesh_layer_1_vtx_0[106];
 extern Gfx jers_mario_Fludd_Switch_Option_Fludd_DL_mesh_layer_1_tri_0[];
